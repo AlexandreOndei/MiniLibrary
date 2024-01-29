@@ -1,0 +1,184 @@
+﻿@model MiniLibrary.Entity.Author
+
+<h2>@(Model == null ? "New" : "Edit") Author</h2>
+<div>
+    <div class="row">
+        <div class="col-md-12 order-md-1">
+            <form class="form-author" novalidate="">
+
+                @if (!string.IsNullOrEmpty(Model?.Id))
+                {
+                    <input type="hidden" id="inputId" value="@Model?.Id" />
+                }
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="firstName">First name</label>
+                        <input type="text" class="form-control" id="firstName" placeholder="" value="@(Model != null ? Model.FirstName : "")" required="">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="lastName">Last name</label>
+                        <input type="text" class="form-control" id="lastName" placeholder="" value="@(Model != null ? Model.LastName : "")" required="">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-9 mb-3">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="you@example.com" value="@(Model != null ? Model.Eamil : "")" required="">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="phone">Phone</label>
+                        <input type="number" class="form-control" id="phone" value="@(Model != null ? Model.Phone : "")" required="">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="address">Address</label>
+                    <input type="text" class="form-control" id="address" placeholder="1234 Main St" value="@(Model != null ? Model.Address1 : "")" required="">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-9 mb-3">
+                        <label for="address2">Address 2</label>
+                        <input type="text" class="form-control" id="address2" placeholder="Apartment or suite" value="@(Model != null ? Model.Address2 : "")" required="">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="zip">Zip</label>
+                        <input type="number" class="form-control" id="zip" value="@(Model != null ? Model.Zip : "")" required="">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="country">Country</label>
+                        <select class="form-control custom-select d-block w-100" id="country" required="">
+                            <option value="">Choose...</option>
+                            @foreach (MiniLibrary.Entity.Country item in ViewBag.Countries)
+                            {
+                                if (Model != null && Model.Country.Equals(item.Iso3))
+                                {
+                                    <option value="@item.Iso3" selected>@item.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Iso3">@item.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="state">State</label>
+                        <select class="form-control custom-select d-block w-100" id="state" required="">
+                            <option value="">Choose...</option>
+                            @foreach (MiniLibrary.Entity.State item in ViewBag.States)
+                            {
+                                if (Model != null && Model.State.Equals(item.State_code))
+                                {
+                                    <option value="@item.State_code" selected>@item.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.State_code">@item.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="city">City</label>
+                        <select class="form-control custom-select d-block w-100" id="city" required="">
+                            <option value="">Choose...</option>
+                            @foreach (string item in ViewBag.Cities)
+                            {
+                                if (Model != null && Model.City.Equals(item))
+                                {
+                                    <option value="@item" selected>@item</option>
+                                }
+                                else
+                                {
+                                    <option value="@item">@item</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">Confirm</button>
+                <a href="/Author" class="btn btn-secondary">Go back</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $('#country').on('change', function () {
+        $.ajax({
+            url: '/Author/States',
+            method: 'GET',
+            dataType: 'HTML',
+            data: {
+                countryName: $('#country option:selected').text(),
+                state: '@Model?.State'
+            },
+            beforeSend: function () {
+                $('#state').prop('disabled', 'disabled');
+            },
+            success: function (response) {
+                $('#state').html(response)
+                $('#state').prop('disabled', null);
+            }
+        })
+    })
+
+    $('#state').on('change', function () {
+        $.ajax({
+            url: '/Author/Cities',
+            method: 'GET',
+            dataType: 'HTML',
+            data: {
+                countryName: $('#country option:selected').text(),
+                stateName: $('#state option:selected').text(),
+                city: '@Model?.City'
+            },
+            beforeSend: function () {
+                $('#city').prop('disabled', 'disabled');
+            },
+            success: function (response) {
+                $('#city').html(response)
+                $('#city').prop('disabled', null);
+            }
+        })
+    })
+
+    $('.form-author').on('submit', function (e) {
+        e.preventDefault()
+
+        let adding = $('#inputId')[0] === undefined
+
+        $.ajax({
+            url: '/Author' + (adding ? '/Add' : '/Edit/'),
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                id: $('#inputId') ? $('#inputId').val() : null,
+                firstName: $('#firstName').val(),
+                lastName: $('#lastName').val(),
+                eamil: $('#email').val(),
+                phone: $('#phone').val(),
+                address1: $('#address').val(),
+                address2: $('#address2').val(),
+                country: $('#country').val(),
+                state: $('#state').val(),
+                city: $('#city').val(),
+                zip: $('#zip').val()
+            },
+            success: function (response) {
+                if (response.success) {
+                    alert('Author succesfully ' + (adding ? 'added' : 'edited') + '!')
+                    location.href = '/Author'
+                }
+                else
+                    alert(response.message)
+            }
+        })
+    })
+</script>

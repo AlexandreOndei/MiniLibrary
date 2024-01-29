@@ -1,0 +1,32 @@
+﻿@model List<MiniLibrary.Entity.Author>
+
+<h2>Authors</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">First</th>
+            <th scope="col">Last</th>
+            <th scope="col">Email</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            var item = Model[i];
+
+            <tr>
+                <th scope="row">@(i + 1)</th>
+                <td>@item.FirstName</td>
+                <td>@item.LastName</td>
+                <td>@item.Eamil</td>
+                <td>
+                    <a href="/Author/Edit/@item.Id" class="btn btn-primary">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<a href="/Author/Add" class="btn btn-primary">New Author</a>
+<a href="/Home" class="btn btn-secondary">Go back</a>

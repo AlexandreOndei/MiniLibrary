@@ -1,0 +1,17 @@
+﻿@model List<MiniLibrary.Entity.State>
+@{
+    Layout = null;
+}
+
+<option value="">Choose...</option>
+@foreach (MiniLibrary.Entity.State item in Model)
+{
+    if ((ViewBag.State ?? "").Equals(item.State_code))
+    {
+        <option value="@item.State_code" selected>@item.Name</option>
+    }
+    else
+    {
+        <option value="@item.State_code">@item.Name</option>
+    }
+}

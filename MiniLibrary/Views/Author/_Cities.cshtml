@@ -1,0 +1,17 @@
+﻿@model List<string>
+@{
+    Layout = null;
+}
+
+<option value="">Choose...</option>
+@foreach (string item in Model)
+{
+    if ((ViewBag.City ?? "").Equals(item))
+    {
+        <option value="@item" selected>@item</option>
+    }
+    else
+    {
+        <option value="@item">@item</option>
+    }
+}

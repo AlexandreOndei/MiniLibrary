@@ -1,0 +1,80 @@
+﻿@model MiniLibrary.Entity.Book
+
+<h2>@(Model == null ? "New" : "Edit") Book</h2>
+<div>
+    <div class="row">
+        <div class="col-md-12 order-md-1">
+            <form class="form-book" novalidate="">
+
+                @if (!string.IsNullOrEmpty(Model?.Id))
+                {
+                    <input type="hidden" id="inputId" value="@Model?.Id" />
+                }
+
+                <div class="mb-3">
+                    <label for="Title">Title</label>
+                    <input type="text" id="inputTitle" class="form-control" value="@(Model != null ? Model.Title : "")" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="Description">Description</label>
+                    <input type="text" id="inputDescription" class="form-control" value="@(Model != null ? Model.Description : "")">
+                </div>
+
+                <div class="mb-3">
+                    <label for="ISBN">ISBN</label>
+                    <input type="text" id="inputISBN" class="form-control" value="@(Model != null ? Model.Isbn : "")" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="publisher">Publisher</label>
+                    <input type="text" id="inputPublisher" class="form-control" value="@(Model != null ? Model.Publisher : "")">
+                </div>
+
+                <div class="mb-3">
+                    <label for="language">Language</label>
+                    <input type="text" id="inputLanguage" class="form-control" value="@(Model != null ? Model.Language : "")">
+                </div>
+
+                <div class="mb-3">
+                    <label for="price">Price</label>
+                    <input type="number" id="inputPrice" class="form-control" value="@(Model != null ? Model.Price : "")" required>
+                </div>
+
+                <button type="submit" class="btn btn-success">Confirm</button>
+                <a href="/Book" class="btn btn-secondary">Go back</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $('.form-book').on('submit', function (e) {
+        e.preventDefault()
+
+        let adding = $('#inputId')[0] === undefined
+
+        $.ajax({
+            url: '/Book' + (adding ? '/Add' : '/Edit/'),
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                id: $('#inputId') ? $('#inputId').val() : null,
+                title: $('#inputTitle').val(),
+                description: $('#inputDescription').val(),
+                isbn: $('#inputISBN').val(),
+                publisher: $('#inputPublisher').val(),
+                language: $('#inputLanguage').val(),
+                price: $('#inputPrice').val()
+            },
+            success: function (response) {
+                if (response.success) {
+                    alert('Book succesfully ' + (adding ? 'added' : 'edited') + '!')
+                    location.href = '/Book'
+                }
+                else
+                    alert(response.message)
+            }
+        })
+    })
+</script>
